@@ -53,4 +53,4 @@ async def test_mux(dut):
             dut.inp25.value, dut.inp26.value, dut.inp27.value, dut.inp28.value, dut.inp29.value, dut.inp30.value]'''
         dut._log.info(f'Sel={dut.sel.value}')
         dut._log.info(f'Inpt={dut.inp10}')
-    assert "Randomised test failed with: {Sel}".format(Sel=dut.sel.value)
+    assert dut.out.value==3, "Randomised test failed with: {Sel}".format(Sel=dut.sel.value)
