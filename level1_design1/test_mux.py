@@ -10,7 +10,6 @@ async def test_mux(dut):
     
     for i in range (0, 31):
         dut.sel.value = random.randint (i, i) #asserting values to selection line from 0 to 30
-        #cocotb.log.info(f'##### sel = {dut.sel.value} ########')
         dut.inp0.value= 3 if (i==0) else 0
         dut.inp1.value= 3 if (i==1) else 0
         dut.inp2.value= 3 if (i==2) else 0
@@ -49,10 +48,10 @@ async def test_mux(dut):
         dut._log.info(f'i={i}')
         dut._log.info(f'Inpt={dut.inp10}')
 
-        if (i>=30 and data.out.value==0):
+        if (i>=30 and dut.out.value==0):
             check=dut.out.value==0
             ou=0
         else:
             check=dut.out.value==3
             ou=3
-        assert dut.out.value==3, "Randomised test failed with: sel = {Sel} \nExpected output = {eout}  Received output = {dval}".format(Sel=dut.sel.value, eout=ou, dval=dut.out.value)
+        assert check, "Randomised test failed with: sel = {Sel} \nExpected output = {eout}  Received output = {dval}".format(Sel=dut.sel.value, eout=ou, dval=dut.out.value)
