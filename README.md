@@ -108,6 +108,7 @@ Updating the design and re-running the test makes the test pass.
 ![image](https://user-images.githubusercontent.com/84698480/182025652-54c412bc-8312-4f43-bea2-d2e0fb66014e.png)
 
 The bug is fixed in the same file mux.v and has been highlighted by a comment
+![image](https://user-images.githubusercontent.com/84698480/182026071-4fc61b49-f8cb-42b6-9f1e-885ead991d62.png)
 
 ## Verification Strategy
 Here the design has 31*2(inp) + 4(sel) input bits, hence the exhaustive testing would consume  much time. To overcome this, Only the input which has to be selected by the selection line inputs *sel* has
