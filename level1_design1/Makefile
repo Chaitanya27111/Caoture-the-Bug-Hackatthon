@@ -4,7 +4,8 @@ TOPLEVEL_LANG ?= verilog
 
 PWD=$(shell pwd)
 
-VERILOG_SOURCES = $(PWD)/mux_bugfree.v
+VERILOG_SOURCES = $(PWD)/mux.v
+#VERILOG_SOURCES = $(PWD)/mux_bugfree.v
 
 TOPLEVEL := mux          # design
 #TOPLEVEL := mux_bugfree          # bug free design
