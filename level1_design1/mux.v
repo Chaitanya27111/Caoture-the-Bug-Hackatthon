@@ -10,7 +10,8 @@ module mux(sel,inp0, inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8,
             inp7, inp8, inp9, inp10, inp11, inp12, inp13, 
             inp14, inp15, inp16, inp17, inp18, inp19, inp20,
             inp21, inp22, inp23, inp24, inp25, inp26,
-            inp27, inp28, inp29, inp30;
+            inp27, inp28, inp29, inp30; 
+                                        
 
   output [1:0] out;
   reg [1:0] out;
@@ -37,8 +38,8 @@ module mux(sel,inp0, inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8,
       5'b01001: out = inp9;  
       5'b01010: out = inp10;
       5'b01011: out = inp11;
-      5'b01101: out = inp12;
-      5'b01101: out = inp13;
+      5'b01101: out = inp12; // bug===>missed 12, modify it to 1110
+      5'b01101: out = inp13; 
       5'b01110: out = inp14;
       5'b01111: out = inp15;
       5'b10000: out = inp16;
@@ -54,7 +55,7 @@ module mux(sel,inp0, inp1, inp2, inp3, inp4, inp5, inp6, inp7, inp8,
       5'b11010: out = inp26;
       5'b11011: out = inp27;
       5'b11100: out = inp28;
-      5'b11101: out = inp29;
+      5'b11101: out = inp29; // no selection lines for line 30, hence sel=11110 will give 0 as output
       default: out = 0;
     endcase
   end
