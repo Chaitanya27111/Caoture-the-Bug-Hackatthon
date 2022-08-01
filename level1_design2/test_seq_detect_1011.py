@@ -25,32 +25,18 @@ async def test_seq_bug1(dut):
 
     cocotb.log.info('#### CTB: Develop your test here! ######')
     
-    inp_seq = [1, 0, 1, 1]
-    #inp_seq = [1, 0, 1, 1, 1, 0, 1, 1]
-    #inp_seq = [1, 1, 0, 1, 1]
-    #inp_seq = [1, 1, 0, 1, 1]
-    #inp_seq = [1, 1, 0, 1, 1]
+    #inp_seq = [1, 1, 0, 1, 1, 1]
+    inp_seq = [1, 1, 0, 1, 0, 1, 1, 1]
+    
     await RisingEdge(dut.clk)
-    for i in range (0, len(inp_seq)-1):
+    for i in range (0, len(inp_seq)):
+        cocotb.log.info("----------------------")
         await Timer(3, units="us")
         dut.inp_bit.value = inp_seq[i]
+        cocotb.log.info(f"Output bit = {dut.seq_seen.value}")
         await RisingEdge(dut.clk)
-        cocotb.log.info("----------------------")
         cocotb.log.info(f"Input bit = {dut.inp_bit.value}")
         cocotb.log.info(f"Current state = {dut.current_state.value}")
         cocotb.log.info(f"Next state = {dut.next_state.value}")
-        #await RisingEdge(dut.clk)
-        cocotb.log.info(f"Output bit = {dut.seq_seen.value}")
-    
-    dut.inp_bit.value=  inp_seq[-1]
-    await RisingEdge(dut.clk)
-    cocotb.log.info("----------------------")
-    cocotb.log.info(f"Input bit = {dut.inp_bit.value}")
-    cocotb.log.info(f"Current state = {dut.current_state.value}")
-    cocotb.log.info(f"Next state = {dut.next_state.value}")
-    await RisingEdge(dut.clk)
-    cocotb.log.info(f"Output bit = {dut.seq_seen.value}")
-    cocotb.log.info(f"Current state = {dut.current_state.value}")
-    cocotb.log.info(f"Next state = {dut.next_state.value}")
-
+        
     assert dut.seq_seen.value==1, f"Failed testcase for input sequence {inp_seq}"
