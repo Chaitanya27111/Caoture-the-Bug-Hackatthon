@@ -45,7 +45,7 @@ dut.sel.value = random.randint (i, i)
         dut.inp30.value=3 if (i==30) else 0
 ```
 
-The assert statement is used for comparing the mux's outut to the expected value.
+The assert statement is used for comparing the mux's output to the expected value.
 
 The following error is seen:
 ```
@@ -103,6 +103,91 @@ Here, the case statement pertaining to the case of selection line *sel*=01101 ha
 
 ## Design Fix
 Update the case of inp12 from ```5'b01101: out = inp12; ```to ```5'b01100: out = inp12;```
+Updating the design and re-running the test makes the test pass.
+
+![image](https://user-images.githubusercontent.com/84698480/182025652-54c412bc-8312-4f43-bea2-d2e0fb66014e.png)
+
+The bug is fixed in the same file mux.v and has been highlighted by a comment
+![image](https://user-images.githubusercontent.com/84698480/182026071-4fc61b49-f8cb-42b6-9f1e-885ead991d62.png)
+
+## Verification Strategy
+Here the design has 31*2(inp) + 4(sel) input bits, hence the exhaustive testing would consume  much time. To overcome this, Only the input which has to be selected by the selection line inputs *sel* has
+been assigned value 11 and remaining inputs are asigned a value of 00. If the design is bug free, it will yield output as 11 for all inputs of selection line except 11110 
+as that will fall under default case.
+
+## Is the verification complete ?
+Yes
+
+
+
+# Level1_Design2
+Image of gitpod environment with id
+![image](https://user-images.githubusercontent.com/84698480/182100357-2f9cb50c-6ee9-456c-abea-9f278f48763f.png)
+
+## Verification Environment
+
+The [CoCoTb](https://www.cocotb.org/) based Python test is developed as explained. The test drives inputs to the Design Under Test (adder module here) which takes 
+1 bit *inp_bit*, 1 bit *reset* and *clk* as inputs and outputs a single bit value *seq_seen*.
+
+The values are assigned to the input port using 
+
+### Testcase1
+```
+inp_seq = [1, 1, 0, 1, 1, 1]
+await RisingEdge(dut.clk)
+for i in range (0, len(inp_seq)):
+        cocotb.log.info("----------------------")
+        await Timer(3, units="us")
+        dut.inp_bit.value = inp_seq[i]
+        cocotb.log.info(f"Output bit = {dut.seq_seen.value}")
+        await RisingEdge(dut.clk)
+        cocotb.log.info(f"Input bit = {dut.inp_bit.value}")
+        cocotb.log.info(f"Current state = {dut.current_state.value}")
+        cocotb.log.info(f"Next state = {dut.next_state.value}")
+```
+
+The assert statement is used for comparing the sequence detector's output with expected output.
+
+The following error is seen:
+```
+assert dut.seq_seen.value==1, f"Failed testcase for input sequence {inp_seq}"
+                     AssertionError: Failed testcase for input sequence [1, 1, 0, 1, 1, 1]
+```
+
+## Test Scenario1 **(Important)**
+- Test Inputs: sequence of *inp_bit*=110111, initially the *reset* is made high till one falling edge and then made low
+- Expected Output: *seq_seen*=1
+- Observed Output in the DUT *seq_seen*=0
+
+Output mismatches for the above inputs proving that there is a design bug
+
+## Design Bug1
+Based on the above test input, nn inspecting the output log, it is found that the next state after the state *SEQ_1* when an input bit 1 is encountered is *IDLE*.
+However, the next state must actually be *SEQ_1*
+```
+#from line 46 of seq_detect_1011.v
+ SEQ_1:
+      begin
+        if(inp_bit == 1)
+          next_state = IDLE; // bug===>next state must be SEQ_1
+        else
+          next_state = SEQ_10;
+      end
+```
+
+## Design Fix
+Update the value assigned to *next_state* from *IDLE* to *SEQ_1* when *inp_bit* is 1 as shown below
+```
+#from line 46 of seq_detect_1011.v
+ SEQ_1:
+      begin
+        if(inp_bit == 1)
+          next_state = SEQ_1; // bug found here has been fixed
+        else
+          next_state = SEQ_10;
+      end
+```
+
 Updating the design and re-running the test makes the test pass.
 
 ![image](https://user-images.githubusercontent.com/84698480/182025652-54c412bc-8312-4f43-bea2-d2e0fb66014e.png)
