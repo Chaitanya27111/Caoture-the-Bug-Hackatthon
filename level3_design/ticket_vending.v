@@ -18,7 +18,7 @@
 // In the original project description, there is no RESET or CLEAR input.
 //
 
-module TicketMachine(Clock, Clear, Ten, Twenty, Ready, Dispense, Return, Bill);
+module ticket_vending(Clock, Clear, Ten, Twenty, Ready, Dispense, Return, Bill);
 input Clock, Clear, Ten, Twenty;
 output Ready, Dispense, Return, Bill;
 reg Ready, Dispense, Return, Bill;
