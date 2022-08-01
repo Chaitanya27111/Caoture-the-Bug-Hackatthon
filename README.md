@@ -167,7 +167,7 @@ assert dut.seq_seen.value==1, f"Failed testcase for input sequence {inp_seq}"
 Output mismatches for the above inputs proving that there is a design bug
 
 ## Design Bug1
-Based on the above test input, nn inspecting the output log, it is found that the next state after the state *SEQ_1* when an input bit 1 is encountered is *IDLE*.
+Based on the above test input, and inspecting the output log, it is found that the next state after the state *SEQ_1* when an input bit 1 is encountered is *IDLE*.
 However, the next state must actually be *SEQ_1*
 ```
 #from line 46 of seq_detect_1011.v
@@ -272,8 +272,105 @@ The bug is fixed in the same file seq_detect_1011.v and has been highlighted by 
 
 
 ## Verification Strategy
-Various corner cases have been thought of and have been applied to the DUT. Hence, in such verification methodolgy, understanding of design and its working are really important.
+Various corner cases have been thought of and have been applied to the DUT. The inputs are asserted values using for loop. In such a verification methodolgy, understanding of design and its working are really important.
 
 ## Note
 For detection of overlapping sequence, the next state after *SEQ_1011* must be *SEQ_10* in case when *inp_bit* is 0 and *SEQ_1* when *inp_bit* is 1. However, this has been not considered as a bug as of now. (Considering that this has been done willingly by the designer)
 
+
+
+# Level3_Design
+Image of gitpod environment with id
+![image](https://user-images.githubusercontent.com/84698480/182178097-c99f56bc-2e70-476a-b1b3-cc5c57099fec.png)
+
+## Verification Environment
+
+The [CoCoTb](https://www.cocotb.org/) based Python test is developed as explained. The test drives inputs to the Design Under Test (adder module here) which takes 
+1 bit *Ten*, 1 bit *Twenty* and *Clock* as inputs and outputs *Dispense*, *Return*, *Bill* and *Ready* each of 1 bit.
+
+The values are assigned to the input port using 
+
+### Testcase
+```
+    # Clear
+    dut.Clear.value = 1
+    await FallingEdge(dut.Clock)  
+    dut.Clear.value = 0
+    await FallingEdge(dut.Clock)
+
+    cocotb.log.info('#### CTB: Develop your test here! ######')
+    
+    inp_seq = [1, 0, 0, 1, 1, 0] # $10+$20+$10 = $40
+    
+    await RisingEdge(dut.Clock)
+    for i in range (0, len(inp_seq), 2):
+        cocotb.log.info("----------------------")
+        dut.Ten.value = inp_seq[i]
+        dut.Twenty.value = inp_seq[i+1]
+        await RisingEdge(dut.Clock)
+```
+
+The assert statement is used for comparing the sequence detector's output with expected output.
+
+The following error is seen:
+```
+assert dut.Dispense.value==1, f"Failed testcase for input sequence {inp_seq}"
+                     AssertionError: Failed testcase for input sequence [1, 0, 0, 1, 1, 0]
+```
+![image](https://user-images.githubusercontent.com/84698480/182179209-d8597bca-28e9-418b-8e4d-75a9fc6b0e66.png)
+
+
+## Test Scenario **(Important)**
+- Test Inputs: sequence of *inp_bit*=100110, initially the *Clear* is made high till one falling edge and then made low to reset the machine
+here, each pair of bits represents {Ten, Twenty} dollar bill inserted in the machine i.e.
+10_01_10 = 3 bills inserted
+           1st bill of $10
+           2nd bill of $20
+           3rd bill of $10
+- Expected Output: *Dispense*=1
+As the sum of the bill inserted is $40, the ticket must be dispensed by the machine.
+- Observed Output in the DUT *Dispense*=0
+
+Output mismatches for the above inputs proving that there is a design bug
+
+## Design Bug introduced
+Based on the above test input, nn inspecting the output log, it is found that the next state after the state *SEQ_1* when an input bit 1 is encountered is *IDLE*.
+However, the next state must actually be *SEQ_1*
+```
+#from line 123 of ticket_vending.v
+ BILL10:	begin
+		if (Ten)
+			NextState = BILL20;
+		else if (Twenty)
+			//NextState = BILL30;
+			NextState = BILL20; //bug introduced
+		else
+			NextState = BILL10;
+		end
+```
+
+## Design Fix1
+Update the value assigned to *next_state* from *IDLE* to *SEQ_1* when *inp_bit* is 1 as shown below
+```
+#from line 123 of seq_detect_1011.v
+ BILL10:	begin
+		if (Ten)
+			NextState = BILL20;
+		else if (Twenty)
+			NextState = BILL30;   // resolved
+			//NextState = BILL20; //bug introduced
+		else
+			NextState = BILL10;
+		end
+```
+
+Updating the design and re-running the test makes the test pass.
+
+![image](https://user-images.githubusercontent.com/84698480/182123047-ad4275be-4e97-4362-bf51-537f82590819.png)
+
+The bug is fixed in the same file seq_detect_1011.v and has been highlighted by a comment
+![image](https://user-images.githubusercontent.com/84698480/182180943-3a618fd4-e031-49eb-a5a4-fdacc9477207.png)
+
+
+## Verification Strategy
+Various corner cases have been thought of and have been applied to the DUT. The inputs are asserted values using for loop. In such a verification methodolgy, understanding of design and its working are really important.
