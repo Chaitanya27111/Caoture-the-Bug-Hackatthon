@@ -25,12 +25,11 @@ async def test_seq_bug1(dut):
 
     cocotb.log.info('#### CTB: Develop your test here! ######')
     
-    inp_seq = [1, 0, 0, 1, 1, 0]
+    inp_seq = [1, 0, 0, 1, 1, 0] # $10+$20+$10 = $40
     
     await RisingEdge(dut.Clock)
     for i in range (0, len(inp_seq), 2):
         cocotb.log.info("----------------------")
-        #await Timer(3, units="us")
         dut.Ten.value = inp_seq[i]
         dut.Twenty.value = inp_seq[i+1]
         await RisingEdge(dut.Clock)
