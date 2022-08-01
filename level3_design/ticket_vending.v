@@ -124,7 +124,8 @@ case (State)
 		if (Ten)
 			NextState = BILL20;
 		else if (Twenty)
-			NextState = BILL30;
+			//NextState = BILL30;
+			NextState = BILL20; //bug introduced
 		else
 			NextState = BILL10;
 		end

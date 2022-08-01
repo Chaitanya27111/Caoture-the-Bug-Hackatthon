@@ -25,7 +25,6 @@ async def test_seq_bug1(dut):
 
     cocotb.log.info('#### CTB: Develop your test here! ######')
     
-    #inp_seq = [1, 1, 0, 1, 1, 1]
     inp_seq = [1, 0, 0, 1, 1, 0]
     
     await RisingEdge(dut.Clock)
