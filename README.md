@@ -124,6 +124,9 @@ Yes
 Image of gitpod environment with id
 ![image](https://user-images.githubusercontent.com/84698480/182100357-2f9cb50c-6ee9-456c-abea-9f278f48763f.png)
 
+# State Diagram
+![state diag](https://user-images.githubusercontent.com/84698480/182130452-fb4ce95f-7636-4a96-a6e9-a0584efd1a39.jpg)
+
 ## Verification Environment
 
 The [CoCoTb](https://www.cocotb.org/) based Python test is developed as explained. The test drives inputs to the Design Under Test (adder module here) which takes 
@@ -199,7 +202,7 @@ The bug is fixed in the same file seq_detect_1011.v and has been highlighted by 
 
 
 
-## Test Scenario2**(Important)**
+## Test Scenario2 **(Important)**
 - Test Inputs: sequence of *inp_bit*=11010111, initially the *reset* is made high till one falling edge and then made low
 - Expected Output: *seq_seen*=1
 - Observed Output in the DUT *seq_seen*=0
