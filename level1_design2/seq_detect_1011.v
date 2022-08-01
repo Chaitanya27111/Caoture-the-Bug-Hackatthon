@@ -46,7 +46,7 @@ module seq_detect_1011(seq_seen, inp_bit, reset, clk);
       SEQ_1:
       begin
         if(inp_bit == 1)
-          next_state = IDLE; //bug===>next state must be SEQ_1
+          next_state = SEQ_1; //bug found here has been fixed
         else
           next_state = SEQ_10;
       end
