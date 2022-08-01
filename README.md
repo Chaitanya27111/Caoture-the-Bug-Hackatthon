@@ -199,6 +199,13 @@ The bug is fixed in the same file seq_detect_1011.v and has been highlighted by 
 
 
 
+## Test Scenario2**(Important)**
+- Test Inputs: sequence of *inp_bit*=11010111, initially the *reset* is made high till one falling edge and then made low
+- Expected Output: *seq_seen*=1
+- Observed Output in the DUT *seq_seen*=0
+
+Output mismatches for the above inputs proving that there is a design bug
+
 ### Testcase2
 ```
 inp_seq = [1, 1, 0, 1, 0, 1, 1, 1]
@@ -223,12 +230,6 @@ assert dut.seq_seen.value==1, f"Failed testcase for input sequence {inp_seq}"
 ```
 ![image](https://user-images.githubusercontent.com/84698480/182126786-d3b602c2-d2e4-418e-952e-4d9729bcdf51.png)
 
-## Test Scenario2**(Important)**
-- Test Inputs: sequence of *inp_bit*=11010111, initially the *reset* is made high till one falling edge and then made low
-- Expected Output: *seq_seen*=1
-- Observed Output in the DUT *seq_seen*=0
-
-Output mismatches for the above inputs proving that there is a design bug
 
 ## Design Bug2
 Based on the above test input, and inspecting the output log, it is found that the next state after the state *SEQ_101* when an input bit 1 is encountered is *IDLE*.
