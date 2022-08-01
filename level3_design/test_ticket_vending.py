@@ -26,7 +26,7 @@ async def test_seq_bug1(dut):
     cocotb.log.info('#### CTB: Develop your test here! ######')
     
     #inp_seq = [1, 1, 0, 1, 1, 1]
-    inp_seq = [1, 1, 0, 1, 0, 1, 1, 1]
+    inp_seq = [1, 0, 0, 1, 0, 1,]
     
     await RisingEdge(dut.Clock)
     for i in range (0, len(inp_seq), 2):
@@ -40,7 +40,7 @@ async def test_seq_bug1(dut):
         cocotb.log.info(f"Output bit Bill = {dut.Bill.value}")
         await RisingEdge(dut.Clock)
         cocotb.log.info(f"Ten = {dut.Ten.value}")
-        cocotb.log.info(f"Ten = {dut.Twenty.value}")
+        cocotb.log.info(f"Twenty = {dut.Twenty.value}")
         cocotb.log.info(f"Current state = {dut.State.value}")
         cocotb.log.info(f"Next state = {dut.NextState.value}")
         
