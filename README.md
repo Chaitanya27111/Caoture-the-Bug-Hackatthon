@@ -373,3 +373,55 @@ The bug is fixed in the same file seq_detect_1011.v and has been highlighted by 
 
 ## Verification Strategy
 Various corner cases have been thought of and have been applied to the DUT. The inputs are asserted values using for loop. In such a verification methodolgy, understanding of design and its working are really important.
+
+
+
+# Level2_Design
+
+# Bit Manipulation Processor Verification
+
+The verification environment is setup using [Vyoma's UpTickPro](https://vyomasystems.com) provided for the hackathon.
+
+*Make sure to include the Gitpod id in the screenshot*
+
+![image](https://user-images.githubusercontent.com/84698480/182200024-df8b3a80-afc0-411e-b358-bb787d5848da.png)
+
+
+## Verification Environment
+
+The [CoCoTb](https://www.cocotb.org/) based Python test is developed as explained. The test drives inputs to the Design Under Test (adder module here) which takes in 3 source operands *mav_putvalue_src1*, *mav_putvalue_src2*, *mav_putvalue_src3* and 1 instruction code *mav_putvalue_instr* each of 32 bits.
+
+The values are assigned to the input port using 
+```
+mav_putvalue_src1 = 0x5
+mav_putvalue_src2 = 0x1
+mav_putvalue_src3 = 0x2
+mav_putvalue_instr = 0x101010B3
+```
+
+The assert statement is used for comparing the bitmanipulator's output to the expected value.
+
+The following error is seen:
+```
+assert dut_output == expected_mav_putvalue, error_message
+                     AssertionError: Value mismatch DUT = 0xa does not match MODEL = 0x0
+```
+## Test Scenario **(Important)**
+- Test Inputs: 
+    mav_putvalue_src1 = 0x5
+    mav_putvalue_src2 = 0x1
+    mav_putvalue_src3 = 0x2
+    mav_putvalue_instr = 0x101010B3
+- Expected Output: expected_mav_putvalue = 0x0
+- Observed Output in the DUT dut.mav_putvalue=0xa
+
+Output mismatches for the above inputs proving that there is a design bug
+
+![image](https://user-images.githubusercontent.com/84698480/182201333-822d6ece-ee32-431e-9ccd-966b4f179213.png)
+
+
+## Verification Strategy
+
+
+## Is the verification complete ?
+
