@@ -153,6 +153,8 @@ The following error is seen:
 assert dut.seq_seen.value==1, f"Failed testcase for input sequence {inp_seq}"
                      AssertionError: Failed testcase for input sequence [1, 1, 0, 1, 1, 1]
 ```
+![image](https://user-images.githubusercontent.com/84698480/182125772-2bd52fc7-5be2-475c-b52d-2002cd512c90.png)
+
 
 ## Test Scenario1 **(Important)**
 - Test Inputs: sequence of *inp_bit*=110111, initially the *reset* is made high till one falling edge and then made low
@@ -175,7 +177,7 @@ However, the next state must actually be *SEQ_1*
       end
 ```
 
-## Design Fix
+## Design Fix1
 Update the value assigned to *next_state* from *IDLE* to *SEQ_1* when *inp_bit* is 1 as shown below
 ```
 #from line 46 of seq_detect_1011.v
@@ -190,15 +192,84 @@ Update the value assigned to *next_state* from *IDLE* to *SEQ_1* when *inp_bit* 
 
 Updating the design and re-running the test makes the test pass.
 
-![image](https://user-images.githubusercontent.com/84698480/182025652-54c412bc-8312-4f43-bea2-d2e0fb66014e.png)
+![image](https://user-images.githubusercontent.com/84698480/182123047-ad4275be-4e97-4362-bf51-537f82590819.png)
 
-The bug is fixed in the same file mux.v and has been highlighted by a comment
-![image](https://user-images.githubusercontent.com/84698480/182026071-4fc61b49-f8cb-42b6-9f1e-885ead991d62.png)
+The bug is fixed in the same file seq_detect_1011.v and has been highlighted by a comment
+![image](https://user-images.githubusercontent.com/84698480/182123316-d343c2bc-86fe-4034-b661-851b95cb5407.png)
+
+
+
+### Testcase2
+```
+inp_seq = [1, 1, 0, 1, 0, 1, 1, 1]
+await RisingEdge(dut.clk)
+for i in range (0, len(inp_seq)):
+        cocotb.log.info("----------------------")
+        await Timer(3, units="us")
+        dut.inp_bit.value = inp_seq[i]
+        cocotb.log.info(f"Output bit = {dut.seq_seen.value}")
+        await RisingEdge(dut.clk)
+        cocotb.log.info(f"Input bit = {dut.inp_bit.value}")
+        cocotb.log.info(f"Current state = {dut.current_state.value}")
+        cocotb.log.info(f"Next state = {dut.next_state.value}")
+```
+
+The assert statement is used for comparing the sequence detector's output with expected output.
+
+The following error is seen:
+```
+assert dut.seq_seen.value==1, f"Failed testcase for input sequence {inp_seq}"
+                     AssertionError: Failed testcase for input sequence inp_seq = [1, 1, 0, 1, 0, 1, 1, 1]
+```
+![image](https://user-images.githubusercontent.com/84698480/182126786-d3b602c2-d2e4-418e-952e-4d9729bcdf51.png)
+
+## Test Scenario2**(Important)**
+- Test Inputs: sequence of *inp_bit*=11010111, initially the *reset* is made high till one falling edge and then made low
+- Expected Output: *seq_seen*=1
+- Observed Output in the DUT *seq_seen*=0
+
+Output mismatches for the above inputs proving that there is a design bug
+
+## Design Bug2
+Based on the above test input, and inspecting the output log, it is found that the next state after the state *SEQ_101* when an input bit 1 is encountered is *IDLE*.
+However, the next state must actually be *SEQ_10*
+```
+#from line 62f seq_detect_1011.v
+SEQ_101:
+      begin
+        if(inp_bit == 1)
+          next_state = SEQ_1011;
+        else
+          next_state = IDLE; //bug===>next state must be SEQ_10
+      end
+```
+
+## Design Fix2
+Update the value assigned to *next_state* from *IDLE* to *SEQ_10* when *inp_bit* is 1 as shown below
+```
+#from line 62 of seq_detect_1011.v
+ SEQ_101:
+      begin
+        if(inp_bit == 1)
+          next_state = SEQ_1011;
+        else
+        /**************Bug fix start**************/
+          next_state = SEQ_10; //bug found here has been fixed
+        /**************Bug fix end**************/
+      end
+```
+
+Updating the design and re-running the test makes the test pass.
+
+![image](https://user-images.githubusercontent.com/84698480/182127987-32b2f64d-f993-4e87-8c5c-c6c6a8669d66.png)
+
+The bug is fixed in the same file seq_detect_1011.v and has been highlighted by a comment
+![image](https://user-images.githubusercontent.com/84698480/182128044-9d903602-4fe0-4b60-a84d-da251f82abb8.png)
+
 
 ## Verification Strategy
-Here the design has 31*2(inp) + 4(sel) input bits, hence the exhaustive testing would consume  much time. To overcome this, Only the input which has to be selected by the selection line inputs *sel* has
-been assigned value 11 and remaining inputs are asigned a value of 00. If the design is bug free, it will yield output as 11 for all inputs of selection line except 11110 
-as that will fall under default case.
+Various corner cases have been thought of and have been applied to the DUT. Hence, in such verification methodolgy, understanding of design and its working are really important.
 
-## Is the verification complete ?
-Yes
+## Note
+For detection of overlapping sequence, the next state after *SEQ_1011* must be *SEQ_10* in case when *inp_bit* is 0 and *SEQ_1* when *inp_bit* is 1. However, this has been not considered as a bug as of now. (Considering that this has been done willingly by the designer)
+
