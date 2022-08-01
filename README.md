@@ -279,6 +279,70 @@ For detection of overlapping sequence, the next state after *SEQ_1011* must be *
 
 
 
+# Level2_Design
+
+# Bit Manipulation Processor Verification
+
+The verification environment is setup using [Vyoma's UpTickPro](https://vyomasystems.com) provided for the hackathon.
+
+*Make sure to include the Gitpod id in the screenshot*
+
+![image](https://user-images.githubusercontent.com/84698480/182200024-df8b3a80-afc0-411e-b358-bb787d5848da.png)
+
+
+## Verification Environment
+
+The [CoCoTb](https://www.cocotb.org/) based Python test is developed as explained. The test drives inputs to the Design Under Test (adder module here) which takes in 3 source operands *mav_putvalue_src1*, *mav_putvalue_src2*, *mav_putvalue_src3* and 1 instruction code *mav_putvalue_instr* each of 32 bits.
+
+The values are assigned to the input port using 
+```
+mav_putvalue_src1 = 0x5
+mav_putvalue_src2 = 0x1
+mav_putvalue_src3 = 0x2
+mav_putvalue_instr = 0x101010B3
+```
+
+The assert statement is used for comparing the bitmanipulator's output to the expected value.
+
+The following error is seen:
+```
+assert dut_output == expected_mav_putvalue, error_message
+                     AssertionError: Value mismatch DUT = 0xa does not match MODEL = 0x0
+```
+## Test Scenario (for basic testbench) **(Important)**
+
+- Test Inputs: 
+    mav_putvalue_src1 = 0x5
+    mav_putvalue_src2 = 0x1
+    mav_putvalue_src3 = 0x2
+    mav_putvalue_instr = 0x101010B3
+- Expected Output: expected_mav_putvalue = 0x0
+- Observed Output in the DUT dut.mav_putvalue=0xa
+
+## Test Scenario (for Randomized testbench) **(Important)**
+
+- Test Inputs: 
+	mav_putvalue_src1 = random.randint (0, 4294967295)
+        mav_putvalue_src2 = random.randint (0, 4294967295)
+        mav_putvalue_src3 = random.randint (0, 4294967295)
+        mav_putvalue_instr = 0x101010B3
+- Expected Output: expected_mav_putvalue = 0x0
+- Observed Output in the DUT dut.mav_putvalue=0x9d1e3b24
+
+Output mismatches for the above inputs proving that there is a design bug
+Following image shows the output of both the testbenches
+![image](https://user-images.githubusercontent.com/84698480/182206147-bf2c7eb2-dda6-4ea5-9b98-0c49d8432107.png)
+
+
+## Verification Strategy
+Two testbenches have been written. One with fiexd inputs as well as a randomized test bench that assigns random value to the inputs. As the number of input bits are high, it is impractical to perform exhaustive testing on the design by applying all possible inputs on the design.
+
+## Is the verification complete ?
+No, Random testing may miss out some test scenarios where the DUT fails.
+
+
+
+
 # Level3_Design
 Image of gitpod environment with id
 ![image](https://user-images.githubusercontent.com/84698480/182178097-c99f56bc-2e70-476a-b1b3-cc5c57099fec.png)
@@ -374,54 +438,4 @@ The bug is fixed in the same file seq_detect_1011.v and has been highlighted by 
 ## Verification Strategy
 Various corner cases have been thought of and have been applied to the DUT. The inputs are asserted values using for loop. In such a verification methodolgy, understanding of design and its working are really important.
 
-
-
-# Level2_Design
-
-# Bit Manipulation Processor Verification
-
-The verification environment is setup using [Vyoma's UpTickPro](https://vyomasystems.com) provided for the hackathon.
-
-*Make sure to include the Gitpod id in the screenshot*
-
-![image](https://user-images.githubusercontent.com/84698480/182200024-df8b3a80-afc0-411e-b358-bb787d5848da.png)
-
-
-## Verification Environment
-
-The [CoCoTb](https://www.cocotb.org/) based Python test is developed as explained. The test drives inputs to the Design Under Test (adder module here) which takes in 3 source operands *mav_putvalue_src1*, *mav_putvalue_src2*, *mav_putvalue_src3* and 1 instruction code *mav_putvalue_instr* each of 32 bits.
-
-The values are assigned to the input port using 
-```
-mav_putvalue_src1 = 0x5
-mav_putvalue_src2 = 0x1
-mav_putvalue_src3 = 0x2
-mav_putvalue_instr = 0x101010B3
-```
-
-The assert statement is used for comparing the bitmanipulator's output to the expected value.
-
-The following error is seen:
-```
-assert dut_output == expected_mav_putvalue, error_message
-                     AssertionError: Value mismatch DUT = 0xa does not match MODEL = 0x0
-```
-## Test Scenario **(Important)**
-- Test Inputs: 
-    mav_putvalue_src1 = 0x5
-    mav_putvalue_src2 = 0x1
-    mav_putvalue_src3 = 0x2
-    mav_putvalue_instr = 0x101010B3
-- Expected Output: expected_mav_putvalue = 0x0
-- Observed Output in the DUT dut.mav_putvalue=0xa
-
-Output mismatches for the above inputs proving that there is a design bug
-
-![image](https://user-images.githubusercontent.com/84698480/182201333-822d6ece-ee32-431e-9ccd-966b4f179213.png)
-
-
-## Verification Strategy
-
-
-## Is the verification complete ?
 
