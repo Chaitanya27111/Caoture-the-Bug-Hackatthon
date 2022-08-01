@@ -334,8 +334,7 @@ As the sum of the bill inserted is $40, the ticket must be dispensed by the mach
 Output mismatches for the above inputs proving that there is a design bug
 
 ## Design Bug introduced
-Based on the above test input, nn inspecting the output log, it is found that the next state after the state *SEQ_1* when an input bit 1 is encountered is *IDLE*.
-However, the next state must actually be *SEQ_1*
+The next state from current state *BILL10* has been changed to *BILL20* when the inserted bill is of $20
 ```
 #from line 123 of ticket_vending.v
  BILL10:	begin
@@ -349,8 +348,8 @@ However, the next state must actually be *SEQ_1*
 		end
 ```
 
-## Design Fix1
-Update the value assigned to *next_state* from *IDLE* to *SEQ_1* when *inp_bit* is 1 as shown below
+## Design Fix
+
 ```
 #from line 123 of seq_detect_1011.v
  BILL10:	begin
